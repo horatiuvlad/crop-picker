@@ -85,34 +85,53 @@ function App() {
   );
 
   return (
-    <div className="App" style={{ minHeight: "100vh", display: "flex" }}>
+    <div
+      className="App"
+      style={{ minHeight: "100vh", display: "flex" }}
+      {...bind()}
+    >
       <animated.div
         style={{
           x,
           y,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
           backgroundColor: "red",
+          ...helperStyles.absoluteFill,
+          zIndex: 1,
         }}
       />
 
       <div
-        {...bind()}
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
           backgroundColor: "blue",
           opacity: 0.5,
+          ...helperStyles.absoluteFill,
+          zIndex: 2,
         }}
       />
+
+      <div
+        style={{
+          ...helperStyles.absoluteFill,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 3,
+        }}
+      >
+        <div style={{ backgroundColor: "green", width: 100, height: 100 }} />
+      </div>
     </div>
   );
 }
+
+const helperStyles = {
+  absoluteFill: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+} as const;
 
 export default App;
