@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "lib/module",
+    "declaration": true,
+    "declarationDir": "lib/typescript"
+  },
+  "exclude": ["**/__tests__/**"]
+}
