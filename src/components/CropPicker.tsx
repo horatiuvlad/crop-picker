@@ -41,6 +41,8 @@ export interface CropPickerProps {
   doubleTapZoom?: number;
   /** Two-finger free rotation. Default false (most products want 90° steps only). */
   rotationEnabled?: boolean;
+  /** Momentum after a pan (decelerates into the bounds). Default true. */
+  flingEnabled?: boolean;
   /** Master interaction switch. Default true. */
   enabled?: boolean;
   /** Circular crop chrome (forces a 1:1 window). Extraction output stays square. */
@@ -88,6 +90,7 @@ export const CropPicker = forwardRef<CropPickerRef, CropPickerProps>(function Cr
     maxZoom = 8,
     doubleTapZoom = 3,
     rotationEnabled = false,
+    flingEnabled = true,
     enabled = true,
     round = false,
     overlayColor,
@@ -158,6 +161,7 @@ export const CropPicker = forwardRef<CropPickerRef, CropPickerProps>(function Cr
     maxZoom,
     doubleTapZoom,
     rotationEnabled,
+    flingEnabled,
     enabled,
     onCropChange,
     containerRef,

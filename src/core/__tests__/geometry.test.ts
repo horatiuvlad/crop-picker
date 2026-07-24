@@ -13,6 +13,7 @@ import {
   rotatedCanvasSize,
   settleTransform,
   transformForRegion,
+  translationBounds,
   windowPointToImagePoint,
   zoomOf,
 } from '../geometry';
@@ -288,6 +289,70 @@ describe('cropRegion', () => {
       expect(r.rect.y).toBeGreaterThanOrEqual(0);
       expect(r.rect.x + r.rect.width).toBeLessThanOrEqual(r.canvasSize.width);
       expect(r.rect.y + r.rect.height).toBeLessThanOrEqual(r.canvasSize.height);
+    }
+  });
+});
+
+describe('translationBounds (fling clamp)', () => {
+  it('is null at free angles (region is not axis-aligned in t-space)', () => {
+    const g = geo(2000, 1000, 200, 200);
+    expect(translationBounds(0.5, degToRad(30), g)).toBeNull();
+    expect(translationBounds(0.5, degToRad(45), g)).toBeNull();
+    expect(translationBounds(0.5, degToRad(89), g)).toBeNull();
+  });
+
+  it('exists at every multiple of 90° (including negatives)', () => {
+    const g = geo(2000, 1000, 200, 200);
+    for (const deg of [-360, -270, -180, -90, 0, 90, 180, 270, 360]) {
+      expect(translationBounds(0.5, degToRad(deg), g)).not.toBeNull();
+    }
+  });
+
+  it('swaps the WINDOW extents on a quarter turn (image extents stay put)', () => {
+    const g = geo(2000, 1000, 300, 100);
+    const s = 0.5; // image displayed at 1000x500
+    const b0 = translationBounds(s, 0, g)!;
+    const b90 = translationBounds(s, degToRad(90), g)!;
+    // upright: slack = half displayed image - half window, per axis
+    expect(b0.maxX).toBeCloseTo(1000 / 2 - 300 / 2, 9); // 350
+    expect(b0.maxY).toBeCloseTo(500 / 2 - 100 / 2, 9); // 200
+    // quarter turn: the window's 300x100 spread swaps to 100x300 against the SAME
+    // displayed image, then t = R(90°)u swaps the resulting axes.
+    expect(b90.maxX).toBeCloseTo(500 / 2 - 300 / 2, 9); // 100
+    expect(b90.maxY).toBeCloseTo(1000 / 2 - 100 / 2, 9); // 450
+  });
+
+  it('agrees exactly with clampTranslation at 90° multiples', () => {
+    const rand = mulberry32(555);
+    for (let i = 0; i < 1200; i++) {
+      const g = geo(
+        300 + Math.floor(rand() * 3000),
+        300 + Math.floor(rand() * 3000),
+        60 + Math.floor(rand() * 240),
+        60 + Math.floor(rand() * 240),
+      );
+      const step = Math.floor(rand() * 8) - 4;
+      const rotation = degToRad(step * 90);
+      const scale = clampScale(coverScale(g, rotation) * (1 + rand() * 5), rotation, g, 10);
+      const bounds = translationBounds(scale, rotation, g);
+      expect(bounds).not.toBeNull();
+      const tx = (rand() - 0.5) * 4000;
+      const ty = (rand() - 0.5) * 4000;
+      const viaClamp = clampTranslation(tx, ty, scale, rotation, g);
+      const viaBounds = {
+        x: Math.min(Math.max(tx, bounds!.minX), bounds!.maxX),
+        y: Math.min(Math.max(ty, bounds!.minY), bounds!.maxY),
+      };
+      expect(viaBounds.x).toBeCloseTo(viaClamp.x, 6);
+      expect(viaBounds.y).toBeCloseTo(viaClamp.y, 6);
+      // and the clamped state genuinely covers the window
+      expect(
+        windowIsCovered(
+          { translateX: viaBounds.x, translateY: viaBounds.y, scale, rotation },
+          g,
+          1e-6,
+        ),
+      ).toBe(true);
     }
   });
 });

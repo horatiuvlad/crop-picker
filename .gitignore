@@ -5,6 +5,11 @@ node_modules/
 lib/
 coverage/
 
+# expo / example build artifacts
+example/dist/
+example/.expo/
+.expo/
+
 # misc
 .DS_Store
 *.log

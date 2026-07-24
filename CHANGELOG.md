@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 — 2026-07-24
+
+- **Momentum fling**: a pan now carries velocity and decelerates into the bounds
+  (`flingEnabled`, default on). Uses `withDecay` with an exact clamp derived from the
+  new `translationBounds()` — the legal region is an axis-aligned box in translation
+  space exactly at 0/90/180/270°, so momentum can never park the window off-image; at
+  free rotation angles the pan settles as before.
+- **`example/`**: a full Expo app (iOS/Android/web) exercising aspect switching, round
+  mode, 90° rotation, reset, and a real crop through the platform backend.
+- **Verified in a browser**: the example was bundled by Metro and driven end-to-end on
+  react-native-web — render, live regions, every aspect, rotation, and a real
+  canvas-backend crop (see the README's "Verified" table). Demo GIF added.
+
 ## 0.2.0 — 2026-07-24
 
 Ground-up rewrite of the 2022 proof-of-concept into a real library.

@@ -109,6 +109,40 @@ export function clampTranslation(
 }
 
 /**
+ * The legal translation range as an AXIS-ALIGNED box in translation space, or null
+ * when no such box exists.
+ *
+ * The legal region is always a box in the ROTATED frame u = R(-θ)·t; it is a box in
+ * t-space too exactly when θ is a multiple of 90° (R then maps axes onto axes,
+ * swapping them at 90°/270°). That is precisely the case where a per-axis animation
+ * (e.g. Reanimated's `withDecay` clamp) is exact — which is what fling uses. For
+ * free angles this returns null and callers fall back to {@link clampTranslation}.
+ */
+export function translationBounds(
+  scale: number,
+  rotation: number,
+  geometry: CropGeometry,
+  toleranceDeg = 0.01,
+): { minX: number; maxX: number; minY: number; maxY: number } | null {
+  'worklet';
+  const deg = radToDeg(rotation);
+  const step = Math.round(deg / 90);
+  if (Math.abs(deg - step * 90) > toleranceDeg) return null;
+
+  const { imageSize, windowSize } = geometry;
+  const quarterTurned = Math.abs(step % 2) === 1; // 90° or 270°
+  // Half-extents of the window in the rotated frame.
+  const halfSpreadX = (quarterTurned ? windowSize.height : windowSize.width) / 2;
+  const halfSpreadY = (quarterTurned ? windowSize.width : windowSize.height) / 2;
+  const slackX = Math.max(0, (scale * imageSize.width) / 2 - halfSpreadX);
+  const slackY = Math.max(0, (scale * imageSize.height) / 2 - halfSpreadY);
+  // t = R(θ)·u swaps the axes on a quarter turn.
+  const boundX = quarterTurned ? slackY : slackX;
+  const boundY = quarterTurned ? slackX : slackY;
+  return { minX: -boundX, maxX: boundX, minY: -boundY, maxY: boundY };
+}
+
+/**
  * Apply a pinch: rescale by `factor` about the window-space focal point, keeping the
  * image point under the focal point stationary: t' = f + factor · (t - f).
  */

@@ -1,5 +1,10 @@
 # @horatiuvlad/crop-picker
 
+[![ci](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@horatiuvlad/crop-picker.svg)](https://www.npmjs.com/package/@horatiuvlad/crop-picker)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-informational)](#)
+
 **One crop picker for React Native _and_ React Native Web.** Fixed crop window, image
 pans / pinch-zooms / rotates underneath (the Instagram model), built on the modern
 cross-platform stack — Reanimated 3 + Gesture Handler 2 — with a pure-math core and
@@ -10,9 +15,15 @@ Why this exists: the ecosystem is split into web-only croppers (`react-easy-crop
 If your app is a single React Native codebase that also ships to the web, there is no
 maintained interactive cropper that runs on both. This is that library.
 
-- 🫳 **Gestures**: pan, pinch-zoom about the focal point, double-tap zoom, optional
-  two-finger rotation — 60 fps on the UI thread via Reanimated worklets, rubber-band
-  overshoot with spring-back clamping.
+![crop-picker demo — square, 4:5, 16:9 and round crop windows](./assets/demo.gif)
+
+<sub>The `example/` app running **on the web** through react-native-web — same component
+that renders on iOS and Android. Aspect switching, round mask, 90° rotation, and a real
+crop through the canvas backend.</sub>
+
+- 🫳 **Gestures**: pan with **momentum fling**, pinch-zoom about the focal point,
+  double-tap zoom, optional two-finger rotation — 60 fps on the UI thread via
+  Reanimated worklets, rubber-band overshoot with spring-back clamping.
 - 🧮 **Provably-correct core**: all geometry is pure, dependency-free TypeScript
   (`coverScale`, `clampTranslation`, `cropRegion`, …) with brute-force-verified
   invariants — the crop window can never escape the image, at any rotation.
@@ -28,6 +39,18 @@ maintained interactive cropper that runs on both. This is that library.
   with one line — or run fully headless and send the crop rect to your server.
 - 📐 **Responsive window**: aspect-ratio or fixed-size crop windows, insets, circular
   mask — recomputed on every layout.
+
+## Try it
+
+```sh
+git clone https://github.com/horatiuvlad/crop-picker && cd crop-picker
+npm install && cd example && npm install
+npm run web        # or: npm run ios / npm run android
+```
+
+The [`example/`](./example) app (Expo) exercises every feature: aspect switching,
+round mode, 90° rotation, reset, and a real crop through the platform's backend —
+canvas on web, `expo-image-manipulator` on native, injected in one line.
 
 ## Install
 
@@ -109,6 +132,7 @@ backend-agnostic instruction (`rotate by N°, then cut rect out of the rotated c
 | `maxZoom` | `8` | max zoom (× the "exactly covers window" scale) |
 | `doubleTapZoom` | `3` | zoom a double-tap toggles to |
 | `rotationEnabled` | `false` | two-finger free rotation (snaps output near 90° steps) |
+| `flingEnabled` | `true` | momentum after a pan (exact bounds at 0/90/180/270°) |
 | `round` | `false` | circular chrome, forces 1:1 window |
 | `overlayColor` / `gridLines` | `rgba(0,0,0,0.55)` / `3` | default chrome knobs |
 | `renderOverlay` | `({containerSize, windowSize}) => ReactNode` | replace the whole overlay |
@@ -169,6 +193,21 @@ src/extract   CropBackend registry; canvas backend (web, auto), Expo + ImageEdit
 Platform forking uses the standard `.web.ts` mechanism, preserved per-file in the
 published build, so web bundlers pick the canvas default and Metro picks the inert
 native default with zero configuration.
+
+## Verified
+
+Beyond the unit suite (31 cases, incl. brute-force invariants over thousands of random
+states × rotations), the `example/` app was **run in a real browser** through
+react-native-web and driven end-to-end:
+
+| Check | Result |
+| --- | --- |
+| Metro bundles the library from source (incl. `.web.ts` forks, worklets) | 580 modules, no resolution errors |
+| Component renders, measures, and emits a live region | `rot 0° rect 1063×1063 @ 269,0` on a 1600×1063 photo — exact centered square |
+| Aspect windows | 4:5 → `850×1063` (0.7996); 16:9 → `1600×900 @ 0,82` — pixel-exact, correctly centered |
+| 90° rotation | region transposes `@269,0` → `@0,269` — exact canvas-space swap |
+| `crop()` through the canvas backend | `blob:` URL decoding to **1063×1063**, `image/jpeg` |
+| Rotated crop output | WYSIWYG — output matches the rotated window content |
 
 ## Caveats, honestly
 

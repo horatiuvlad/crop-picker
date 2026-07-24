@@ -7,6 +7,7 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withDecay,
   withTiming,
   type AnimatedRef,
 } from 'react-native-reanimated';
@@ -14,6 +15,7 @@ import Animated, {
 import {
   applyPinch,
   applyRotation,
+  clampScale,
   clampTranslation,
   coverScale,
   cropRegion,
@@ -21,6 +23,7 @@ import {
   initialTransform,
   radToDeg,
   settleTransform,
+  translationBounds,
   zoomOf,
 } from '../core/geometry';
 import type { CropGeometry, CropRegion, CropTransform, Point } from '../core/types';
@@ -32,6 +35,12 @@ export interface CropperGestureConfig {
   doubleTapZoom?: number;
   /** Enable the two-finger free-rotation gesture. Default false. */
   rotationEnabled?: boolean;
+  /**
+   * Momentum: keep panning after the finger lifts, decelerating into the bounds.
+   * Default true. Exact at 0/90/180/270° (where the legal region is an axis-aligned
+   * box); at free rotation angles the pan settles immediately instead.
+   */
+  flingEnabled?: boolean;
   /** Master gesture switch. Default true. */
   enabled?: boolean;
   /** Fired with the resolved crop region whenever gestures settle. */
@@ -65,6 +74,8 @@ const SETTLE_MS = 240;
 const OVERSHOOT_RESIST = 0.45; // fraction of translation overshoot that survives while dragging
 const SCALE_RESIST_POW = 0.3; // pinch resistance beyond limits: bound * (x/bound)^pow
 const IS_WEB = Platform.OS === 'web';
+const MIN_FLING_SPEED = 120; // px/s below which a lift is a stop, not a throw
+const FLING_DECELERATION = 0.993;
 
 /**
  * Layer 2/3: binds the pure core to Reanimated shared values + gesture handlers.
@@ -81,6 +92,7 @@ export function useCropperGestures(
     maxZoom = 8,
     doubleTapZoom = 3,
     rotationEnabled = false,
+    flingEnabled = true,
     enabled = true,
     containerRef,
   } = config;
@@ -96,6 +108,12 @@ export function useCropperGestures(
    * container-minus-window on each axis — the component reports it here.
    */
   const containerPad = useSharedValue<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Fling bookkeeping: `flingGen` invalidates callbacks from a decay that a newer
+  // gesture (or a settle) has superseded; `flingPending` counts the two axes so the
+  // region is emitted once, when both have come to rest.
+  const flingGen = useSharedValue(0);
+  const flingPending = useSharedValue(0);
 
   // Latest callback without re-creating gestures when the consumer re-renders.
   const onCropChangeRef = useRef(config.onCropChange);
@@ -167,6 +185,7 @@ export function useCropperGestures(
 
     const settle = () => {
       'worklet';
+      flingGen.value += 1; // any in-flight decay callback is now stale
       const target = settleTransform(current(), geo, maxZoom);
       animateTo(target);
       runOnJS(emitRegion)(cropRegion(target, geo));
@@ -204,6 +223,60 @@ export function useCropperGestures(
       };
     };
 
+    /**
+     * Momentum. Runs only when the legal region is an axis-aligned box in
+     * translation space (rotation ≡ 0 mod 90°) and the scale is already legal —
+     * then per-axis `withDecay` with a clamp is EXACT. Otherwise fall back to
+     * settling, so momentum can never park the image outside the crop window.
+     */
+    const fling = (velocityX: number, velocityY: number) => {
+      'worklet';
+      const t = current();
+      const bounds = translationBounds(t.scale, t.rotation, geo);
+      const legalScale = clampScale(t.scale, t.rotation, geo, maxZoom);
+      if (
+        bounds === null ||
+        Math.abs(legalScale - t.scale) > 1e-6 ||
+        Math.hypot(velocityX, velocityY) < MIN_FLING_SPEED
+      ) {
+        settle();
+        return;
+      }
+
+      const gen = flingGen.value + 1;
+      flingGen.value = gen;
+      flingPending.value = 2;
+      const onAxisDone = () => {
+        'worklet';
+        if (flingGen.value !== gen) return; // superseded by a newer gesture
+        flingPending.value -= 1;
+        if (flingPending.value === 0) {
+          runOnJS(emitRegion)(cropRegion(current(), geo));
+        }
+      };
+
+      translateX.value = withDecay(
+        {
+          velocity: velocityX,
+          deceleration: FLING_DECELERATION,
+          clamp: [bounds.minX, bounds.maxX],
+          rubberBandEffect: true,
+          rubberBandFactor: 0.8,
+        },
+        onAxisDone,
+      );
+      translateY.value = withDecay(
+        {
+          velocity: velocityY,
+          deceleration: FLING_DECELERATION,
+          clamp: [bounds.minY, bounds.maxY],
+          rubberBandEffect: true,
+          rubberBandFactor: 0.8,
+        },
+        onAxisDone,
+      );
+    };
+
     const pan = Gesture.Pan()
       .enabled(enabled)
       .averageTouches(true)
@@ -214,9 +287,10 @@ export function useCropperGestures(
         t.translateY += e.changeY;
         apply(resistTranslation(t));
       })
-      .onEnd(() => {
+      .onEnd((e) => {
         'worklet';
-        settle();
+        if (flingEnabled) fling(e.velocityX, e.velocityY);
+        else settle();
       });
 
     const pinch = Gesture.Pinch()
@@ -275,7 +349,7 @@ export function useCropperGestures(
       Gesture.Simultaneous(pan, pinch, rotate),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geoKey, maxZoom, doubleTapZoom, rotationEnabled, enabled]);
+  }, [geoKey, maxZoom, doubleTapZoom, rotationEnabled, flingEnabled, enabled]);
 
   const setContainerPadding = (x: number, y: number) => {
     containerPad.value = { x, y };
@@ -299,6 +373,7 @@ export function useCropperGestures(
   });
 
   const animateFromJS = (target: CropTransform) => {
+    flingGen.value += 1; // supersede any in-flight momentum
     const cfg = { duration: SETTLE_MS, easing: Easing.out(Easing.cubic) };
     translateX.value = withTiming(target.translateX, cfg);
     translateY.value = withTiming(target.translateY, cfg);

@@ -1,0 +1,30 @@
+{
+  "name": "crop-picker-example",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "export:web": "expo export --platform web"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~4.0.1",
+    "@horatiuvlad/crop-picker": "file:..",
+    "expo": "~52.0.28",
+    "expo-asset": "~11.0.5",
+    "expo-image-manipulator": "~13.0.6",
+    "expo-status-bar": "~2.0.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.6",
+    "react-native-gesture-handler": "~2.20.2",
+    "react-native-reanimated": "~3.16.7",
+    "react-native-web": "~0.19.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2"
+  }
+}

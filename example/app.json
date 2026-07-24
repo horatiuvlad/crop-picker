@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "crop-picker example",
+    "slug": "crop-picker-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "web": {
+      "bundler": "metro"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}

@@ -32,6 +32,7 @@ export {
   initialTransform,
   settleTransform,
   transformForRegion,
+  translationBounds,
   windowPointToImagePoint,
   zoomOf,
 } from './core/geometry';
