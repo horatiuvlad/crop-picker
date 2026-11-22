@@ -5,7 +5,11 @@
     "module": "CommonJS",
     "moduleResolution": "Node10",
     "outDir": "lib/commonjs",
-    "declaration": false
+    "declaration": false,
+    "baseUrl": ".",
+    "paths": {
+      "react-native": ["./node_modules/react-native/types_generated/index.d.ts"]
+    }
   },
   "exclude": ["**/__tests__/**"]
 }

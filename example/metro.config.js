@@ -24,6 +24,5 @@ const escaped = path
 config.resolver.blockList = [new RegExp(`^${escaped}${path.sep === '\\' ? '\\\\' : '/'}.*$`)];
 
 config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules')];
-config.resolver.disableHierarchicalLookup = true;
 
 module.exports = config;
