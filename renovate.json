@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "The example's expo moves through the shared Expo preset; expo-fix.yml then aligns the example's other Expo packages.",
+    "The library's dev copies of React, React Native, Reanimated and Gesture Handler are Expo-managed names, so the preset leaves them alone:",
+    "move them by hand to the example's versions after an SDK bump. peerDependencies are ranges users rely on and never move here."
+  ],
+  "extends": [
+    "github>foreverworks/renovate-config:expo"
+  ],
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "peerDependencies"
+      ],
+      "enabled": false
+    }
+  ]
+}

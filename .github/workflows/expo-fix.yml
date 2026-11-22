@@ -1,0 +1,22 @@
+# When Renovate moves the example's expo, align the rest of its Expo packages (github.com/foreverworks/renovate-config).
+name: expo-fix
+
+on:
+  push:
+    branches: ["renovate/**"]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: expo-fix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fix:
+    uses: foreverworks/renovate-config/.github/workflows/expo-fix.yml@main
+    with:
+      app-dir: example
+      node-version: "22"
+      ci-workflow: ci.yml
