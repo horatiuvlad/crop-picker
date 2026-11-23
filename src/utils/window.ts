@@ -1,7 +1,7 @@
 import type { Size } from '../core/types';
 
 /**
- * How the crop window is derived from the measured container — every field
+ * How the crop window is derived from the measured container. Every field
  * optional, everything computed responsively on layout:
  *  - `width`/`height`: request a fixed window (clamped into the container inset).
  *  - `aspect`: largest window of this aspect ratio that fits inside the inset

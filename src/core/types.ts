@@ -23,7 +23,7 @@ export interface Rect {
  *  - The crop window is an axis-aligned rect of size `windowSize`, centered at the origin
  *    of "window space" (screen dp, y down).
  *  - The image is drawn centered at the origin, scaled by `scale`, rotated by `rotation`
- *    (radians, clockwise — matching screen coords with y down), then translated by
+ *    (radians, clockwise, matching screen coords with y down), then translated by
  *    `(translateX, translateY)` in window space:
  *
  *        p_screen = R(rotation) · (scale · p_image) + t

@@ -1,44 +1,49 @@
 # @horatiuvlad/crop-picker
 
 [![ci](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@horatiuvlad/crop-picker.svg)](https://www.npmjs.com/package/@horatiuvlad/crop-picker)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-informational)](#)
 
-**One crop picker for React Native _and_ React Native Web.** Fixed crop window, image
-pans / pinch-zooms / rotates underneath (the Instagram model), built on the modern
-cross-platform stack — Reanimated 3 + Gesture Handler 2 — with a pure-math core and
-pluggable extraction backends.
+**Let people crop an image in your React Native app, on iOS, Android and the web, with one
+component.** The crop window stays fixed while the image pans, pinch-zooms and rotates
+underneath it (the Instagram model). It is built on Reanimated and Gesture Handler, with
+a pure-math core and pluggable extraction backends.
 
-Why this exists: the ecosystem is split into web-only croppers (`react-easy-crop`,
-`react-image-crop`, …) and native-only croppers (`react-native-image-crop-picker`, …).
-If your app is a single React Native codebase that also ships to the web, there is no
-maintained interactive cropper that runs on both. This is that library.
+Who it is for: apps that are a single React Native codebase and also ship to the web
+through react-native-web. Croppers tend to target one side: web-only ones
+(`react-easy-crop`, `react-image-crop`) or native-only ones
+(`react-native-image-crop-picker`). If you only target the web, one of the web croppers
+is the simpler choice.
 
-![crop-picker demo — square, 4:5, 16:9 and round crop windows](./assets/demo.gif)
+You need an app that already runs `react-native` (0.72 or newer), `react-native-reanimated`
+(3.6 or newer) and `react-native-gesture-handler` (2.14 or newer). The `example/` app runs
+on Expo SDK 58, React Native 0.88, Reanimated 4.7 and Gesture Handler 3.3.
 
-<sub>The `example/` app running **on the web** through react-native-web — same component
+![crop-picker demo: square, 4:5, 16:9 and round crop windows](./assets/demo.gif)
+
+<sub>The `example/` app running on the web through react-native-web: the same component
 that renders on iOS and Android. Aspect switching, round mask, 90° rotation, and a real
 crop through the canvas backend.</sub>
 
-- 🫳 **Gestures**: pan with **momentum fling**, pinch-zoom about the focal point,
-  double-tap zoom, optional two-finger rotation — 60 fps on the UI thread via
-  Reanimated worklets, rubber-band overshoot with spring-back clamping.
-- 🧮 **Provably-correct core**: all geometry is pure, dependency-free TypeScript
-  (`coverScale`, `clampTranslation`, `cropRegion`, …) with brute-force-verified
-  invariants — the crop window can never escape the image, at any rotation.
-- 🧩 **Dynamic at every layer** — use as much or as little as you want:
+- **Gestures**: pan with momentum fling, pinch-zoom about the focal point, double-tap
+  zoom and optional two-finger rotation. Gestures run on the UI thread through
+  Reanimated worklets, with rubber-band overshoot and spring-back clamping.
+- **A tested core**: all geometry is pure, dependency-free TypeScript (`coverScale`,
+  `clampTranslation`, `cropRegion`, ...). The tests check, over thousands of random
+  states and rotations, that the crop window never leaves the image.
+- **Use as much or as little as you want:**
   | Layer | What | Swap it by |
   | --- | --- | --- |
   | core | pure crop math | importing the functions directly |
   | hook | `useCropperGestures` | building your own UI on top |
   | component | `<CropPicker />` | `renderOverlay`, style & sizing props |
   | extraction | `cropImage` + backends | `setCropBackend(...)` |
-- 🖼️ **Extraction included**: canvas backend built in on web (zero config); on native
-  inject Expo's `expo-image-manipulator` or `@react-native-community/image-editor`
-  with one line — or run fully headless and send the crop rect to your server.
-- 📐 **Responsive window**: aspect-ratio or fixed-size crop windows, insets, circular
-  mask — recomputed on every layout.
+- **Extraction included**: a canvas backend is built in on web and needs no setup. On
+  native you pass in Expo's `expo-image-manipulator` or
+  `@react-native-community/image-editor` with one line, or you run headless and send the
+  crop rectangle to your server.
+- **Responsive window**: aspect-ratio or fixed-size crop windows, insets and a circular
+  mask, recomputed on every layout.
 
 ## Try it
 
@@ -49,20 +54,32 @@ npm run web        # or: npm run ios / npm run android
 ```
 
 The [`example/`](./example) app (Expo) exercises every feature: aspect switching,
-round mode, 90° rotation, reset, and a real crop through the platform's backend —
-canvas on web, `expo-image-manipulator` on native, injected in one line.
+round mode, 90° rotation, reset, and a real crop through the platform's backend:
+canvas on web, `expo-image-manipulator` on native, set up with one line.
 
 ## Install
 
+The package is not on npm yet: `npm view @horatiuvlad/crop-picker` answered 404 on
+2026-11-23. Until it is published, pack it from a clone and install the tarball (the
+`example/` app links the library the same way, with `file:..`):
+
 ```sh
-npm install @horatiuvlad/crop-picker
-# peer deps (you almost certainly have them already):
+git clone https://github.com/horatiuvlad/crop-picker && cd crop-picker
+npm ci && npm pack     # runs typecheck, tests and build, then writes horatiuvlad-crop-picker-0.3.0.tgz
+cd ../your-app && npm install ../crop-picker/horatiuvlad-crop-picker-0.3.0.tgz
+```
+
+The package declares four peer dependencies: `react` (18 or newer), `react-native`
+(0.72 or newer), `react-native-gesture-handler` (2.14 or newer) and
+`react-native-reanimated` (3.6 or newer). If your app lacks the last two:
+
+```sh
 npm install react-native-gesture-handler react-native-reanimated
 ```
 
-Reanimated needs its Babel plugin and Gesture Handler its one-time setup — follow
-their standard install docs. On web, this works wherever `react-native-web` +
-Reanimated/Gesture Handler web support are configured (Expo web works out of the box).
+Reanimated needs its Babel plugin and Gesture Handler its one-time setup; follow
+their install docs. On web, it works wherever `react-native-web` and Reanimated and
+Gesture Handler web support are configured (Expo web works out of the box).
 
 ## Quickstart
 
@@ -101,8 +118,8 @@ export function Avatar() {
 ### Native extraction backend (one line, at startup)
 
 On **web** the built-in canvas backend is registered automatically. On **native**,
-inject whichever engine your app already uses (this keeps Metro happy — the library
-never imports optional native modules itself):
+pass in whichever engine your app already uses. The library never imports optional
+native modules itself, so Metro has nothing to fail on:
 
 ```ts
 // Expo
@@ -112,13 +129,13 @@ setCropBackend(createExpoImageManipulatorBackend(ImageManipulator));
 ```
 
 ```ts
-// Bare RN (no rotation support in this engine — keep rotationEnabled off)
+// Bare RN (this engine cannot rotate: keep rotationEnabled off)
 import ImageEditor from '@react-native-community/image-editor';
 import { setCropBackend, createImageEditorBackend } from '@horatiuvlad/crop-picker';
 setCropBackend(createImageEditorBackend(ImageEditor));
 ```
 
-No backend at all? Everything except `crop()` still works — take the `CropRegion`
+No backend at all? Everything except `crop()` still works: take the `CropRegion`
 from `onCropChange`/`getCropRegion()` and crop server-side; it is a complete,
 backend-agnostic instruction (`rotate by N°, then cut rect out of the rotated canvas`).
 
@@ -128,7 +145,7 @@ backend-agnostic instruction (`rotate by N°, then cut rect out of the rotated c
 | --- | --- | --- |
 | `source` | uri string, `{uri}`, or `require(...)` | image to crop |
 | `imageSize` | `{width, height}` | intrinsic px; auto-detected if omitted |
-| `cropArea` | `{aspect?, width?, height?, inset?}` — `{aspect: 1, inset: 24}` | window sizing spec, responsive to layout |
+| `cropArea` | `{aspect?, width?, height?, inset?}`, default `{aspect: 1, inset: 24}` | window sizing spec, responsive to layout |
 | `maxZoom` | `8` | max zoom (× the "exactly covers window" scale) |
 | `doubleTapZoom` | `3` | zoom a double-tap toggles to |
 | `rotationEnabled` | `false` | two-finger free rotation (snaps output near 90° steps) |
@@ -143,7 +160,7 @@ backend-agnostic instruction (`rotate by N°, then cut rect out of the rotated c
 `reset()`, `rotate90(clockwise?)`, `setZoom(z)`.
 
 **`crop(options)`**: `{ format?: 'jpeg'|'png'|'webp', quality?: 0..1, resize?: {width?, height?}, output?: 'object-url'|'data-url' /* web */ }`
-→ `{ uri, width, height, blob? /* web */, base64? }`.
+Defaults: `format: 'jpeg'`, `quality: 0.9`. It resolves to `{ uri, width, height, blob? /* web */, base64?, mimeType? }`.
 
 ## Headless / custom UI
 
@@ -152,15 +169,17 @@ import {
   useCropperGestures, cropRegion, transformForRegion, coverScale,
 } from '@horatiuvlad/crop-picker';
 
+// geometry is { imageSize, windowSize }, or null until both are known
 const { gesture, animatedStyle, api } = useCropperGestures(geometry, { maxZoom: 6 });
-// render your own image + chrome; wrap in <GestureDetector gesture={gesture}>
+// render your own image and chrome; wrap them in <GestureDetector gesture={gesture}>
 ```
 
-Or skip React entirely — the core is plain math:
+Or skip React entirely; the core is plain math:
 
 ```ts
 import { cropRegion, settleTransform } from '@horatiuvlad/crop-picker';
 const region = cropRegion(transform, { imageSize, windowSize });
+// region.rect and region.rotationDeg say what to cut and how far to rotate first
 ```
 
 ## The coordinate model (for integrators)
@@ -174,7 +193,7 @@ p_screen = R(rotation) · (scale · p_image) + t
 ```
 
 A crop resolves to a `CropRegion`: rotate the source by `rotationDeg` about its
-center (canvas grows to `canvasSize`), then cut the axis-aligned `rect` — which is
+center (canvas grows to `canvasSize`), then cut the axis-aligned `rect`, which is
 exactly the instruction every extraction engine (canvas, expo, server-side sharp)
 can execute. Rotations within 0.75° of a 90° step are snapped, so the common cases
 produce exact crops.
@@ -183,47 +202,48 @@ produce exact crops.
 
 ```
 src/core      pure geometry (zero deps; 'worklet'-tagged so the same functions run
-              on the Reanimated UI thread; brute-force-tested invariants)
-src/hooks     useCropperGestures — shared values + gesture composition + settle logic
-src/components CropPicker + DefaultOverlay (mask, grid, ring — plain RN Views)
-src/extract   CropBackend registry; canvas backend (web, auto), Expo + ImageEditor
-              factories (injected, never imported — Metro-safe)
+              on the Reanimated UI thread; invariants tested by brute force)
+src/hooks     useCropperGestures: shared values, gesture composition, settle logic
+src/components CropPicker + DefaultOverlay (mask, grid, ring: plain RN Views)
+src/extract   CropBackend registry; canvas backend (web, automatic), Expo and
+              ImageEditor factories (passed in, never imported)
 ```
 
-Platform forking uses the standard `.web.ts` mechanism, preserved per-file in the
-published build, so web bundlers pick the canvas default and Metro picks the inert
-native default with zero configuration.
+Platform forking uses the standard `.web.ts` mechanism, kept per file in the built
+package, so web bundlers pick the canvas default and Metro picks the inert native
+default without configuration.
 
-## Verified
+## What was tested
 
-Beyond the unit suite (31 cases, incl. brute-force invariants over thousands of random
-states × rotations), the `example/` app was **run in a real browser** through
-react-native-web and driven end-to-end:
+Besides the unit suite (31 cases, including brute-force invariants over thousands of
+random states and rotations), the `example/` app was run in a real browser through
+react-native-web and driven end to end when 0.3.0 was prepared. These are the results
+of that run, not of every build:
 
 | Check | Result |
 | --- | --- |
 | Metro bundles the library from source (incl. `.web.ts` forks, worklets) | 580 modules, no resolution errors |
-| Component renders, measures, and emits a live region | `rot 0° rect 1063×1063 @ 269,0` on a 1600×1063 photo — exact centered square |
-| Aspect windows | 4:5 → `850×1063` (0.7996); 16:9 → `1600×900 @ 0,82` — pixel-exact, correctly centered |
-| 90° rotation | region transposes `@269,0` → `@0,269` — exact canvas-space swap |
-| `crop()` through the canvas backend | `blob:` URL decoding to **1063×1063**, `image/jpeg` |
-| Rotated crop output | WYSIWYG — output matches the rotated window content |
+| Component renders, measures, and emits a live region | `rot 0° rect 1063×1063 @ 269,0` on a 1600×1063 photo: an exact centered square |
+| Aspect windows | 4:5 → `850×1063` (0.7996); 16:9 → `1600×900 @ 0,82`: pixel-exact and centered |
+| 90° rotation | region transposes `@269,0` → `@0,269`: an exact canvas-space swap |
+| `crop()` through the canvas backend | `blob:` URL decoding to 1063×1063, `image/jpeg` |
+| Rotated crop output | matches what the rotated window showed |
 
-## Caveats, honestly
+## Limits
 
 - The **interactive UI** requires Reanimated ≥ 3.6 and Gesture Handler ≥ 2.14 (the
   core and extraction layers work without them).
-- `@react-native-community/image-editor` cannot rotate — pair rotation with the Expo
+- `@react-native-community/image-editor` cannot rotate, so pair rotation with the Expo
   backend or the web canvas.
 - Some Expo SDK versions rotate counter-clockwise for positive degrees; if rotated
   crops come out wrong, flip `createExpoImageManipulatorBackend(m, { counterClockwise: true })`.
 - On web, cross-origin images need CORS headers (the canvas backend sets
   `crossOrigin='anonymous'`).
-- On web, `crop()` returns an **object URL** — call `URL.revokeObjectURL(result.uri)`
+- On web, `crop()` returns an object URL: call `URL.revokeObjectURL(result.uri)`
   when you're done with it (or use `output: 'data-url'`). Browsers that can't encode
-  a requested format fall back to PNG silently — check `result.mimeType`.
+  a requested format fall back to PNG silently, so check `result.mimeType`.
 - `setTransform()` followed by `getCropRegion()` in the same tick may read the
-  previous state on native (Reanimated writes are async, reads sync) — read on the
+  previous state on native (Reanimated writes are async, reads sync), so read on the
   next frame.
 
 ## License

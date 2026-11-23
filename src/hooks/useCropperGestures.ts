@@ -66,7 +66,7 @@ export interface CropperApi {
   rotate90(clockwise?: boolean): void;
   /** Animate to a zoom level about the window center. */
   setZoom(zoom: number): void;
-  /** Jump (no animation) to an explicit transform — advanced/restore use. */
+  /** Jump (no animation) to an explicit transform. For advanced use and restoring a saved crop. */
   setTransform(transform: CropTransform): void;
 }
 
@@ -79,7 +79,7 @@ const FLING_DECELERATION = 0.993;
 
 /**
  * Layer 2/3: binds the pure core to Reanimated shared values + gesture handlers.
- * UI-agnostic — `CropPicker` composes it, but any custom UI can too.
+ * UI-agnostic: `CropPicker` composes it, but any custom UI can too.
  *
  * `geometry` must be non-null once the container is measured and the image size is
  * known; while null, gestures are inert and `getRegion()` returns null.
@@ -105,7 +105,7 @@ export function useCropperGestures(
   /**
    * Gesture events are in CONTAINER coordinates; the math wants WINDOW-centered
    * coordinates. The container centers the window, so the correction is half the
-   * container-minus-window on each axis — the component reports it here.
+   * container-minus-window on each axis; the component reports it here.
    */
   const containerPad = useSharedValue<{ x: number; y: number }>({ x: 0, y: 0 });
 
@@ -131,7 +131,7 @@ export function useCropperGestures(
   const contentOpacity = useSharedValue(0);
 
   // Snap to the initial (covering, centered) state whenever the geometry changes.
-  // Layout effect: on web, passive effects run after paint — a plain useEffect
+  // Layout effect: on web, passive effects run after paint, so a plain useEffect
   // would flash the un-snapped image for one frame.
   const geoKey = geometry
     ? `${geometry.imageSize.width}x${geometry.imageSize.height}|${geometry.windowSize.width}x${geometry.windowSize.height}`
@@ -204,7 +204,7 @@ export function useCropperGestures(
     };
 
     // RNGH reports pinch focal / rotation anchor in VIEW coordinates on native but
-    // VIEWPORT coordinates on web — normalize to view coordinates first.
+    // VIEWPORT coordinates on web, so normalize to view coordinates first.
     const toViewCoords = (x: number, y: number): Point => {
       'worklet';
       if (IS_WEB && containerRef) {
@@ -225,7 +225,7 @@ export function useCropperGestures(
 
     /**
      * Momentum. Runs only when the legal region is an axis-aligned box in
-     * translation space (rotation ≡ 0 mod 90°) and the scale is already legal —
+     * translation space (rotation ≡ 0 mod 90°) and the scale is already legal;
      * then per-axis `withDecay` with a clamp is EXACT. Otherwise fall back to
      * settling, so momentum can never park the image outside the crop window.
      */
@@ -333,7 +333,7 @@ export function useCropperGestures(
         const t = current();
         const z = zoomOf(t.scale, t.rotation, geo);
         const targetZoom = z > (doubleTapZoom + 1) / 2 ? 1 : doubleTapZoom;
-        // Tap coordinates are view-relative on every platform — no web correction.
+        // Tap coordinates are view-relative on every platform, so no web correction.
         const focal: Point = {
           x: e.x - geo.windowSize.width / 2 - containerPad.value.x,
           y: e.y - geo.windowSize.height / 2 - containerPad.value.y,
@@ -422,7 +422,7 @@ export function useCropperGestures(
     },
     /**
      * NOTE (native): shared-value writes from the JS thread land on the UI runtime
-     * asynchronously, while reads are synchronous — `setTransform` followed by
+     * asynchronously, while reads are synchronous: `setTransform` followed by
      * `getTransform`/`getRegion` in the SAME tick may observe the previous state.
      * Read on the next frame (or use the value you just set).
      */

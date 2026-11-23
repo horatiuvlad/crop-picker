@@ -28,8 +28,8 @@ export interface CropPickerProps {
   /** Image to crop: uri string, `{uri}` object, or `require(...)` module. */
   source: CropSource;
   /**
-   * Intrinsic bitmap size. Optional — auto-detected via Image.getSize /
-   * resolveAssetSource — but passing it avoids a roundtrip and is REQUIRED where
+   * Intrinsic bitmap size. Optional: auto-detected via Image.getSize /
+   * resolveAssetSource, but passing it avoids a roundtrip and is REQUIRED where
    * auto-detection can't work (module assets on some web setups).
    */
   imageSize?: Size;
@@ -131,7 +131,7 @@ export const CropPicker = forwardRef<CropPickerRef, CropPickerProps>(function Cr
 
   // Memos keyed on PRIMITIVES: consumers pass `imageSize`/`cropArea` as inline
   // object literals, and keying on object identity would rebuild geometry every
-  // parent render — re-firing onReady (and looping if onReady sets state).
+  // parent render, re-firing onReady (and looping if onReady sets state).
   const windowSize = useMemo(
     () => (containerSize ? computeWindowSize(containerSize, cropArea, round) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps

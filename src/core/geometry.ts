@@ -9,7 +9,7 @@ import type { CropGeometry, CropRegion, CropTransform, Point, Size } from './typ
  * these stay ordinary, unit-testable functions.
  *
  * See {@link CropTransform} for the coordinate model. The invariant every clamp
- * enforces: the window must always be fully covered by the image —
+ * enforces: the window must always be fully covered by the image, so
  * every window corner, mapped into image space, lies inside the bitmap.
  */
 
@@ -115,7 +115,7 @@ export function clampTranslation(
  * The legal region is always a box in the ROTATED frame u = R(-θ)·t; it is a box in
  * t-space too exactly when θ is a multiple of 90° (R then maps axes onto axes,
  * swapping them at 90°/270°). That is precisely the case where a per-axis animation
- * (e.g. Reanimated's `withDecay` clamp) is exact — which is what fling uses. For
+ * (e.g. Reanimated's `withDecay` clamp) is exact, which is what fling uses. For
  * free angles this returns null and callers fall back to {@link clampTranslation}.
  */
 export function translationBounds(
@@ -228,7 +228,7 @@ export function rotatedCanvasSize(imageSize: Size, rotation: number): Size {
  * Resolve the current view-state into an executable {@link CropRegion}.
  *
  * Key fact (what makes extraction simple): screen space and rotated-canvas space
- * differ only by scale + offset — p_canvas = (p_screen - t)/s + canvasCenter — so the
+ * differ only by scale + offset: p_canvas = (p_screen - t)/s + canvasCenter, so the
  * axis-aligned window maps to an axis-aligned rect in the rotated canvas.
  *
  * Snapping: rotations within `snapEpsilonDeg` of a multiple of 90° are snapped, so
@@ -279,7 +279,7 @@ export function cropRegion(
 
 /**
  * The transform that shows exactly `region` in the window again (inverse of
- * {@link cropRegion}, up to integer snapping) — lets callers restore a saved crop.
+ * {@link cropRegion}, up to integer snapping), which lets callers restore a saved crop.
  */
 export function transformForRegion(region: CropRegion, geometry: CropGeometry): CropTransform {
   'worklet';

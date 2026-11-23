@@ -23,7 +23,7 @@ export function resolveSourceUri(source: CropSource): string | undefined {
 }
 
 /**
- * Best-effort intrinsic-size detection. Explicit `imageSize` props always win —
+ * Best-effort intrinsic-size detection. Explicit `imageSize` props always win;
  * this is the fallback for plain uri/module sources.
  */
 export async function resolveImageSize(source: CropSource): Promise<Size> {

@@ -3,7 +3,7 @@ import { resolveOutputSize } from './types';
 import type { CropRegion } from '../core/types';
 
 /**
- * Structural type for the `expo-image-manipulator` module — passed IN by the
+ * Structural type for the `expo-image-manipulator` module, passed IN by the
  * consumer, never imported here (keeps Metro from trying to resolve an optional
  * dependency at bundle time).
  */

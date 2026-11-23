@@ -3,7 +3,7 @@ import { CropPickerError, resolveOutputSize } from './types';
 import type { CropRegion } from '../core/types';
 
 /**
- * Structural type for `@react-native-community/image-editor` — passed IN by the
+ * Structural type for `@react-native-community/image-editor`, passed IN by the
  * consumer, never imported here. v4 resolves an object; v3 resolved a bare uri
  * string; both are handled.
  */
@@ -23,7 +23,7 @@ export interface ImageEditorLike {
 /**
  * Extraction backend for bare React Native apps using
  * `@react-native-community/image-editor`. NOTE: that module cannot rotate, so this
- * backend only executes regions with rotationDeg === 0 — disable rotation on the
+ * backend only executes regions with rotationDeg === 0, so disable rotation on the
  * component (default) or use the Expo backend when you need rotated crops.
  */
 export function createImageEditorBackend(imageEditor: ImageEditorLike): CropBackend {

@@ -20,7 +20,7 @@ const GRID_COLOR = 'rgba(255, 255, 255, 0.55)';
 
 /**
  * The default chrome: four mask panes around the window, an optional circular
- * ring mask, a subtle window border, and grid lines. Pure RN Views — renders
+ * ring mask, a subtle window border, and grid lines. Pure RN Views, so it renders
  * identically on native and react-native-web. Fully replaceable via the
  * component's `renderOverlay` prop.
  */

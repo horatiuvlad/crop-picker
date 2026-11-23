@@ -3,7 +3,7 @@
 //
 // The library is linked in as `file:..`, so Metro follows the symlink and would
 // otherwise resolve `react`, `react-native`, `reanimated` and `gesture-handler`
-// from the LIBRARY's own node_modules (they're devDependencies there) — two React
+// from the LIBRARY's own node_modules (they're devDependencies there), giving two React
 // copies, and every hook throws "Cannot read properties of null (reading
 // 'useState')". Blocking the library's node_modules forces every import to land on
 // the example's single copy. This mirrors what a published install does naturally

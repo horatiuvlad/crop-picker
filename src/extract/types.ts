@@ -19,7 +19,7 @@ export interface CropOptions {
 export interface CropResult {
   /**
    * URI of the produced image (file:// on native, object/data URL on web).
-   * Web note: object URLs are never revoked by the library — call
+   * Web note: object URLs are never revoked by the library: call
    * `URL.revokeObjectURL(uri)` when done to avoid accumulating blobs.
    */
   uri: string;
@@ -32,15 +32,15 @@ export interface CropResult {
   /**
    * Actual encoded MIME type when the backend reports one (web). Browsers fall
    * back to image/png when they can't encode the requested format (e.g. webp on
-   * Safari) — check this instead of assuming the requested format.
+   * Safari): check this instead of assuming the requested format.
    */
   mimeType?: string;
 }
 
 /**
- * A pluggable extraction engine. Backends receive the fully-resolved instruction —
- * "rotate by `region.rotationDeg`, then cut `region.rect` out of the rotated canvas"
- * — so they contain zero cropper logic.
+ * A pluggable extraction engine. Backends receive the fully-resolved instruction,
+ * "rotate by `region.rotationDeg`, then cut `region.rect` out of the rotated canvas",
+ * so they contain zero cropper logic.
  */
 export interface CropBackend {
   name: string;

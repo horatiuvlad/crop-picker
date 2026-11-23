@@ -1,7 +1,7 @@
 {
   "name": "@horatiuvlad/crop-picker",
   "version": "0.3.0",
-  "description": "Cross-platform image crop picker for React Native AND React Native Web — one codebase: pan/pinch/rotate crop UI, pure-math core, pluggable extraction backends.",
+  "description": "Cross-platform image crop picker for React Native and React Native Web, from one codebase: pan, pinch and rotate crop UI, pure-math core, pluggable extraction backends.",
   "license": "MIT",
   "author": "Horatiu Vlad",
   "repository": {

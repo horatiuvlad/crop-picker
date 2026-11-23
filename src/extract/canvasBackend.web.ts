@@ -22,7 +22,7 @@ function loadImage(uri: string): Promise<HTMLImageElement> {
 /**
  * Zero-dependency web backend. Draws the source rotated about its center onto an
  * output canvas positioned so that exactly `region.rect` (in rotated-canvas space)
- * fills the output — one pass, including any resize.
+ * fills the output in one pass, including any resize.
  */
 export function createCanvasBackend(): CropBackend {
   return {

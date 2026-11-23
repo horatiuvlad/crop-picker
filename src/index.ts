@@ -1,25 +1,25 @@
 /**
- * @horatiuvlad/crop-picker — cross-platform crop picker for React Native and
+ * @horatiuvlad/crop-picker: cross-platform crop picker for React Native and
  * React Native Web. Four independently usable layers:
  *
  *  1. core/      pure geometry (zero deps, worklet-ready)
- *  2. hooks/     useCropperGestures — Reanimated + Gesture Handler binding
- *  3. components CropPicker + DefaultOverlay — batteries-included UI
+ *  2. hooks/     useCropperGestures: Reanimated + Gesture Handler binding
+ *  3. components CropPicker + DefaultOverlay: batteries-included UI
  *  4. extract/   pluggable extraction backends (canvas built in on web)
  */
 
-// Layer 3 — component
+// Layer 3: component
 export { CropPicker, type CropPickerProps, type CropPickerRef } from './components/CropPicker';
 export { DefaultOverlay, type OverlayProps } from './components/DefaultOverlay';
 
-// Layer 2 — headless gesture/state binding
+// Layer 2: headless gesture/state binding
 export {
   useCropperGestures,
   type CropperApi,
   type CropperGestureConfig,
 } from './hooks/useCropperGestures';
 
-// Layer 1 — pure core
+// Layer 1: pure core
 export * from './core/types';
 export * as geometry from './core/geometry';
 export {
@@ -37,7 +37,7 @@ export {
   zoomOf,
 } from './core/geometry';
 
-// Layer 4 — extraction
+// Layer 4: extraction
 export { cropImage, getCropBackend, setCropBackend } from './extract/registry';
 export {
   CropPickerError,
