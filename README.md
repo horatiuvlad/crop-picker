@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/horatiuvlad/crop-picker/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-informational)](#)
+![platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20Android%20%7C%20Web-informational)
 
 **Let people crop an image in your React Native app, on iOS, Android and the web, with one
 component.** The crop window stays fixed while the image pans, pinch-zooms and rotates
@@ -59,14 +59,18 @@ canvas on web, `expo-image-manipulator` on native, set up with one line.
 
 ## Install
 
-The package is not on npm yet: `npm view @horatiuvlad/crop-picker` answered 404 on
-2026-11-23. Until it is published, pack it from a clone and install the tarball (the
-`example/` app links the library the same way, with `file:..`):
+The package is not on npm yet. Until it is, pack it from a clone and install the tarball:
 
 ```sh
 git clone https://github.com/horatiuvlad/crop-picker && cd crop-picker
 npm ci && npm pack     # runs typecheck, tests and build, then writes horatiuvlad-crop-picker-0.3.0.tgz
-cd ../your-app && npm install ../crop-picker/horatiuvlad-crop-picker-0.3.0.tgz
+```
+
+Then, from your app's folder, install the tarball (the file name carries the version in
+`package.json`):
+
+```sh
+npm install /path/to/crop-picker/horatiuvlad-crop-picker-0.3.0.tgz
 ```
 
 The package declares four peer dependencies: `react` (18 or newer), `react-native`
@@ -222,7 +226,7 @@ of that run, not of every build:
 
 | Check | Result |
 | --- | --- |
-| Metro bundles the library from source (incl. `.web.ts` forks, worklets) | 580 modules, no resolution errors |
+| Metro bundles the library from source, including the `.web.ts` forks and worklets | no resolution errors |
 | Component renders, measures, and emits a live region | `rot 0° rect 1063×1063 @ 269,0` on a 1600×1063 photo: an exact centered square |
 | Aspect windows | 4:5 → `850×1063` (0.7996); 16:9 → `1600×900 @ 0,82`: pixel-exact and centered |
 | 90° rotation | region transposes `@269,0` → `@0,269`: an exact canvas-space swap |
@@ -245,6 +249,10 @@ of that run, not of every build:
 - `setTransform()` followed by `getCropRegion()` in the same tick may read the
   previous state on native (Reanimated writes are async, reads sync), so read on the
   next frame.
+
+## Questions and bugs
+
+Use [GitHub issues](https://github.com/horatiuvlad/crop-picker/issues).
 
 ## License
 
