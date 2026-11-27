@@ -55,6 +55,6 @@
     "react-native-gesture-handler": "~3.3.0",
     "react-native-reanimated": "4.7.1",
     "typescript": "^5.5.4",
-    "vitest": "^2.1.8"
+    "vitest": "^5.0.0"
   }
 }
